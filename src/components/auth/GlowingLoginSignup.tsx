@@ -128,6 +128,7 @@ const GlowingLoginSignup: React.FC<GlowingLoginSignupProps> = ({ onClose, onComp
       height: '120px',
       borderRadius: '24px',
       y: [0, -10, 0],
+      boxShadow: `0 0 15px 2px ${primaryColor}33, 0 0 30px 5px ${secondaryColor}22`,
       transition: {
         y: {
           repeat: Infinity,
@@ -136,25 +137,20 @@ const GlowingLoginSignup: React.FC<GlowingLoginSignupProps> = ({ onClose, onComp
         }
       }
     },
+    hover: {
+      boxShadow: `0 0 25px 5px ${primaryColor}66, 0 0 40px 10px ${secondaryColor}44`
+    },
     expanded: {
       width: '400px',
       height: isSignUp ? '550px' : '400px',
       borderRadius: '24px',
       y: 0,
+      boxShadow: `0 0 20px 3px ${primaryColor}55, 0 0 35px 7px ${secondaryColor}33`,
       transition: {
         type: 'spring',
         damping: 20,
         stiffness: 100
       }
-    }
-  };
-  
-  const glowVariants = {
-    initial: {
-      boxShadow: `0 0 15px 2px ${primaryColor}33, 0 0 30px 5px ${secondaryColor}22`
-    },
-    hover: {
-      boxShadow: `0 0 25px 5px ${primaryColor}66, 0 0 40px 10px ${secondaryColor}44`
     }
   };
   
@@ -241,12 +237,12 @@ const GlowingLoginSignup: React.FC<GlowingLoginSignupProps> = ({ onClose, onComp
         variants={containerVariants}
         onMouseEnter={() => !isExpanded && setIsExpanded(true)}
         whileHover={!isExpanded ? "hover" : undefined}
-        variants={glowVariants}
         style={{ 
           background: `rgba(18, 18, 30, 0.8)`,
           backdropFilter: 'blur(10px)',
           border: `1px solid rgba(${parseInt(primaryColor.slice(1, 3), 16)}, ${parseInt(primaryColor.slice(3, 5), 16)}, ${parseInt(primaryColor.slice(5, 7), 16)}, 0.3)`,
-          willChange: 'transform, opacity, box-shadow'
+          willChange: 'transform, opacity, box-shadow',
+          boxShadow: `0 0 15px 2px ${primaryColor}33, 0 0 30px 5px ${secondaryColor}22`
         }}
       >
         {!isExpanded && (
@@ -256,6 +252,7 @@ const GlowingLoginSignup: React.FC<GlowingLoginSignupProps> = ({ onClose, onComp
             animate={{ opacity: 1 }}
           >
             <motion.div
+              className="flex flex-col items-center"
               animate={{
                 filter: [
                   `drop-shadow(0 0 8px ${primaryColor})`, 
@@ -266,6 +263,17 @@ const GlowingLoginSignup: React.FC<GlowingLoginSignupProps> = ({ onClose, onComp
               transition={{ duration: 2, repeat: Infinity }}
             >
               <Lock size={40} color={primaryColor} />
+              <motion.span 
+                className="mt-2 font-bold tracking-wider"
+                style={{ 
+                  background: `linear-gradient(to right, ${primaryColor}, ${secondaryColor})`,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}
+              >
+                LOGIN
+              </motion.span>
             </motion.div>
           </motion.div>
         )}
@@ -551,13 +559,14 @@ const GlowingLoginSignup: React.FC<GlowingLoginSignupProps> = ({ onClose, onComp
               }}
             />
             
-            <style jsx>{`
+            {/* Add shine animation using regular style tag */}
+            <style dangerouslySetInnerHTML={{ __html: `
               @keyframes shine-${i} {
                 0% { transform: translateY(-100%) }
                 20% { transform: translateY(100%) }
                 100% { transform: translateY(100%) }
               }
-            `}</style>
+            `}} />
           </motion.div>
         ))}
       </div>
