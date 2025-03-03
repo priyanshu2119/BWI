@@ -182,29 +182,41 @@ const GlowingLoginSignup: React.FC<GlowingLoginSignupProps> = ({ onClose, onComp
     }
   };
   
+  // Update the flashcard variants for better animations
   const flashcardVariants = {
-    initial: { opacity: 0, y: 20, rotateY: 10, rotateX: 10 },
-    animate: (i: number) => ({
+    initial: { opacity: 0, y: 50, rotateY: 15, rotateX: 15 },
+    animate: (i) => ({
       opacity: 1,
       y: 0,
       rotateY: [-5, 5, -5],
-      rotateX: [2, -2, 2],
+      rotateX: [3, -3, 3],
+      z: i * 15, // Creates a stacked effect
       transition: {
         delay: 0.3 + i * 0.1,
+        opacity: { duration: 0.5 },
+        y: { duration: 0.5 },
         rotateY: {
           repeat: Infinity,
           repeatType: 'reverse',
-          duration: 5 + i,
+          duration: 6 + i * 0.5,
+          ease: "easeInOut"
         },
         rotateX: {
           repeat: Infinity,
           repeatType: 'reverse',
-          duration: 6 + i,
+          duration: 5 + i * 0.5,
+          ease: "easeInOut"
         }
       }
-    })
+    }),
+    hover: {
+      scale: 1.05,
+      rotateY: [-10, 10, -10],
+      rotateX: [-5, 5, -5],
+      transition: { duration: 0.3 }
+    }
   };
-  
+
   const flashcards = [
     { title: "Track Moods", content: "Log daily emotions" },
     { title: "Get Support", content: "Connect with peers" },
@@ -419,20 +431,20 @@ const GlowingLoginSignup: React.FC<GlowingLoginSignupProps> = ({ onClose, onComp
                 )}
                 
                 <motion.div className="mt-6" variants={itemVariants}>
-                  <Button
+                  <motion.button
                     type="submit"
-                    fullWidth
-                    disabled={isSubmitting}
-                    className="py-2.5"
-                    style={{
-                      background: `linear-gradient(to right, ${primaryColor}, ${secondaryColor})`,
-                      border: 'none'
+                    className="w-full bg-transparent bg-opacity-20 border border-opacity-40 rounded-lg py-3 text-white font-medium transition-all hover:bg-opacity-30 flex items-center justify-center"
+                    style={{ 
+                      borderColor: primaryColor,
+                      boxShadow: `0 0 10px ${primaryColor}66` 
                     }}
                     whileHover={{ 
                       scale: 1.03,
-                      boxShadow: `0 0 20px ${primaryColor}66`
+                      boxShadow: `0 0 15px ${primaryColor}99` 
                     }}
-                    whileTap={{ scale: 0.97 }}
+                    whileTap={{ scale: 0.98 }}
+                    variants={itemVariants}
+                    disabled={isSubmitting}
                   >
                     {isSubmitting ? (
                       <span className="flex items-center justify-center">
@@ -442,8 +454,23 @@ const GlowingLoginSignup: React.FC<GlowingLoginSignupProps> = ({ onClose, onComp
                         </svg>
                         Processing...
                       </span>
-                    ) : isSignUp ? 'Create Account' : 'Sign In'}
-                  </Button>
+                    ) : (
+                      <>
+                        <User size={18} className="mr-2" style={{ color: primaryColor }} />
+                        <span 
+                          className="font-bold tracking-wider"
+                          style={{ 
+                            background: `linear-gradient(to right, ${primaryColor}, ${secondaryColor})`,
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text' 
+                          }}
+                        >
+                          {isSignUp ? 'SIGNUP' : 'LOGIN'}
+                        </span>
+                      </>
+                    )}
+                  </motion.button>
                 </motion.div>
               </form>
               
@@ -487,23 +514,50 @@ const GlowingLoginSignup: React.FC<GlowingLoginSignupProps> = ({ onClose, onComp
         </AnimatePresence>
       </motion.div>
       
-      {/* Flashcards at the bottom */}
-      <div className="absolute bottom-10 flex space-x-4 justify-center w-full">
-        {flashcards.map((card, index) => (
+      {/* Update the bottom flashcards section to make them bigger and more stylish */}
+      <div className="absolute bottom-4 flex justify-center w-full space-x-4 pointer-events-none">
+        {flashcards.map((card, i) => (
           <motion.div
-            key={index}
-            custom={index}
+            key={i}
+            custom={i}
             variants={flashcardVariants}
             initial="initial"
             animate="animate"
-            className="w-48 h-32 bg-gray-800 bg-opacity-70 backdrop-filter backdrop-blur-md p-4 rounded-lg shadow-lg"
+            whileHover="hover"
+            className="bg-opacity-90 backdrop-blur-sm rounded-lg p-4 text-white w-[160px] shadow-xl"
             style={{ 
-              border: `1px solid ${primaryColor}33`,
-              boxShadow: `0 5px 15px rgba(0,0,0,0.3), 0 0 10px ${primaryColor}33`
+              background: `linear-gradient(135deg, ${primaryColor}ee, ${secondaryColor}ee)`,
+              transformStyle: "preserve-3d",
+              perspective: "1000px",
+              boxShadow: `0 10px 25px rgba(0,0,0,0.2), 0 0 8px ${primaryColor}66, inset 0 1px 1px rgba(255,255,255,0.2)`,
+              border: `1px solid ${primaryColor}44`,
+              transform: `rotate(${i % 2 === 0 ? -2 : 2}deg)`,
             }}
           >
-            <h3 className="text-lg font-medium mb-2" style={{ color: primaryColor }}>{card.title}</h3>
-            <p className="text-sm text-gray-300">{card.content}</p>
+            <h4 className="text-base font-bold mb-2" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
+              {card.title}
+            </h4>
+            <p className="text-sm opacity-90" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.2)" }}>
+              {card.content}
+            </p>
+            
+            {/* Add a subtle shine effect */}
+            <div 
+              className="absolute inset-0 rounded-lg opacity-20"
+              style={{
+                background: 'linear-gradient(45deg, transparent 0%, rgba(255,255,255,0.2) 45%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.2) 55%, transparent 100%)',
+                transform: 'translateY(-100%)',
+                animation: `shine-${i} 3s infinite`,
+              }}
+            />
+            
+            <style jsx>{`
+              @keyframes shine-${i} {
+                0% { transform: translateY(-100%) }
+                20% { transform: translateY(100%) }
+                100% { transform: translateY(100%) }
+              }
+            `}</style>
           </motion.div>
         ))}
       </div>

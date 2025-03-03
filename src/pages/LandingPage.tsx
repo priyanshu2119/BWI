@@ -114,20 +114,9 @@ const LandingPage: React.FC = () => {
   
   const handleLoginSignupComplete = () => {
     setShowLoginSignup(false);
-    setShowingFlashcards(true);
-    setShowFlashcards(true);
     
-    // Start flashcard sequence
-    const flashcardInterval = setInterval(() => {
-      setCurrentFlashcard(prev => {
-        if (prev >= flashcardsData.length - 1) {
-          clearInterval(flashcardInterval);
-          setIsLoading(true);
-          return prev;
-        }
-        return prev + 1;
-      });
-    }, 2000);
+    // Go directly to loading screen, bypassing flashcards
+    setIsLoading(true);
   };
   
   const handleLoadingComplete = () => {
