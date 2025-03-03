@@ -23,6 +23,7 @@ import useStore from '../store/useStore';
 import { getMoodTextColor } from '../utils/theme';
 import LoadingScreen from '../components/loading/LoadingScreen';
 import GlowingLoginSignup from '../components/auth/GlowingLoginSignup';
+import TopForumPosts from '../components/forum/TopForumPosts';
 
 // Flashcard data
 const flashcardsData = [
@@ -433,6 +434,13 @@ const LandingPage: React.FC = () => {
               </motion.div>
             ))}
           </motion.div>
+        </div>
+      </section>
+
+      {/* Top Forum Posts Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <TopForumPosts />
         </div>
       </section>
       
