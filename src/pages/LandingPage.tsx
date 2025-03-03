@@ -22,6 +22,7 @@ import MoodSelector from '../components/ui/MoodSelector';
 import useStore from '../store/useStore';
 import { getMoodTextColor } from '../utils/theme';
 import LoadingScreen from '../components/loading/LoadingScreen';
+import GlowingLoginSignup from '../components/auth/GlowingLoginSignup';
 
 // Flashcard data
 const flashcardsData = [
@@ -47,6 +48,7 @@ const LandingPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showingFlashcards, setShowingFlashcards] = useState(false);
   const [currentFlashcard, setCurrentFlashcard] = useState(0);
+  const [showLoginSignup, setShowLoginSignup] = useState(false);
   const navigate = useNavigate();
   const mainRef = useRef<HTMLDivElement>(null);
   
@@ -106,6 +108,12 @@ const LandingPage: React.FC = () => {
   };
   
   const handleGetStarted = () => {
+    // Show the login/signup component
+    setShowLoginSignup(true);
+  };
+  
+  const handleLoginSignupComplete = () => {
+    setShowLoginSignup(false);
     setShowingFlashcards(true);
     setShowFlashcards(true);
     
@@ -120,9 +128,6 @@ const LandingPage: React.FC = () => {
         return prev + 1;
       });
     }, 2000);
-    
-    // Cleanup
-    return () => clearInterval(flashcardInterval);
   };
   
   const handleLoadingComplete = () => {
@@ -199,6 +204,17 @@ const LandingPage: React.FC = () => {
           Emergency Help
         </Button>
       </motion.div>
+      
+      {/* Login/Signup Modal */}
+      <AnimatePresence>
+        {showLoginSignup && (
+          <GlowingLoginSignup
+            onClose={() => setShowLoginSignup(false)}
+            onComplete={handleLoginSignupComplete}
+            accentColors={colors}
+          />
+        )}
+      </AnimatePresence>
       
       {/* Flashcards Modal */}
       <AnimatePresence>
@@ -288,10 +304,7 @@ const LandingPage: React.FC = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-4xl md:text-6xl font-bold mb-4"
           style={{ 
-            background: `linear-gradient(to right, ${colors[0]}, ${colors[1]})`,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
+            color: colors[0]
           }}
         >
           Mindful
@@ -327,7 +340,7 @@ const LandingPage: React.FC = () => {
             onClick={handleGetStarted} 
             size="lg" 
             style={{ 
-              background: `linear-gradient(to right, ${colors[0]}, ${colors[1]}</Button>)`,
+              background: `linear-gradient(to right, ${colors[0]}, ${colors[1]})`,
               border: 'none'
             }}
           >
@@ -386,10 +399,7 @@ const LandingPage: React.FC = () => {
               variants={itemVariants}
               className="text-3xl md:text-4xl font-bold mb-4"
               style={{ 
-                background: `linear-gradient(to right, ${colors[0]}, ${colors[1]})`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text' 
+                color: colors[0]
               }}
             >
               Features Designed for Student Well-being

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import MoodTracker from './pages/MoodTracker';
@@ -15,6 +15,17 @@ import Friends from './pages/Friends';
 import Doctor from './pages/Doctor';
 import useStore from './store/useStore';
 
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user } = useStore();
+  const location = useLocation();
+
+  if (!user?.isAuthenticated) {
+    return <Navigate to="/" state={{ from: location }} replace />;
+  }
+
+  return <>{children}</>;
+};
+
 const App: React.FC = () => {
   const { darkMode } = useStore();
   
@@ -23,7 +34,11 @@ const App: React.FC = () => {
       <Router>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } />
           <Route path="/mood-tracker" element={<MoodTracker />} />
           <Route path="/forum" element={<Forum />} />
           <Route path="/resources" element={<Resources />} />

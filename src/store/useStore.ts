@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 import { 
-  User, 
   MoodEntry, 
   Resource, 
   ForumPost, 
@@ -20,6 +19,15 @@ import {
   BodyMapPoint,
   VentBoxRecording
 } from '../types';
+
+type User = {
+  id: string;
+  name: string;
+  xp: number;
+  streak: number;
+  lastActive: string;
+  isAuthenticated?: boolean;
+};
 
 interface State {
   user: User;
@@ -64,6 +72,8 @@ interface State {
   sendHeartToGlobalEmotion: (emotionId: string) => void;
   setShowFlashcards: (show: boolean) => void;
   incrementStreak: () => void;
+  setUser: (userData: User) => void;
+  logout: () => void;
 }
 
 // Mock initial data
@@ -73,6 +83,8 @@ const mockUser: User = {
   xp: 120,
   level: 2,
   streak: 3,
+  lastActive: Date.now().toString(),
+  isAuthenticated: true,
   badges: [
     {
       id: '1',
@@ -759,7 +771,22 @@ const useStore = create<State>()(
       incrementStreak: () => 
         set((state) => ({ 
           user: { ...state.user, streak: state.user.streak + 1 } 
-        }))
+        })),
+
+      setUser: (userData) => set({ 
+        user: { ...userData, isAuthenticated: true } 
+      }),
+
+      logout: () => set({ 
+        user: { 
+          id: '', 
+          name: '', 
+          xp: 0, 
+          streak: 0, 
+          lastActive: '',
+          isAuthenticated: false
+        }
+      })
     }),
     {
       name: 'mental-health-hub-storage'
