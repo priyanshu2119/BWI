@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import useStore from '../store/useStore';
@@ -21,8 +21,21 @@ import {
   HeartPulse,
   Map,
   Clock,
-  Mic
+  Mic,
+  Video,
+  Calendar as CalendarIcon,
+  BookOpen as BookOpenIcon,
+  BadgeCheck,
+  Star
 } from 'lucide-react';
+
+// Import new components
+import MoodTrackerPanel from '../components/dashboard/MoodTrackerPanel';
+import WelcomeSection from '../components/dashboard/WelcomeSection';
+import DailyChallengeCard from '../components/dashboard/DailyChallengeCard';
+import ProgressPanel from '../components/dashboard/ProgressPanel';
+import UpcomingSessions from '../components/dashboard/UpcomingSessions';
+import RecommendedResources from '../components/dashboard/RecommendedResources';
 
 // Mood-specific theme configurations
 const moodConfigs = {
@@ -123,6 +136,61 @@ const moodConfigs = {
   }
 };
 
+// Sample data for new components
+const mockData = {
+  // For MoodTrackerPanel
+  moodData: {
+    dailyMoodPercentage: 65,
+    dominantMood: "neutral",
+    moodInsight: "You're maintaining a steady emotional balance today."
+  },
+  // For WelcomeSection
+  welcomeData: {
+    quoteOfTheDay: "The greatest glory in living lies not in never falling, but in rising every time we fall."
+  },
+  // For ProgressPanel
+  progressData: {
+    completedTasks: 3,
+    totalTasks: 5,
+    achievements: [
+      { id: 1, name: "7-Day Streak", icon: <BadgeCheck size={16} /> },
+      { id: 2, name: "Mood Master", icon: <Star size={16} /> }
+    ]
+  },
+  // For UpcomingSessions
+  upcomingSessions: [
+    {
+      id: 1,
+      title: "Mindfulness Workshop",
+      date: "Today, 3:00 PM",
+      host: "Dr. Sarah Johnson",
+      type: "workshop"
+    },
+    {
+      id: 2,
+      title: "Therapy Session",
+      date: "Tomorrow, 11:00 AM",
+      host: "Dr. Michael Chen",
+      type: "therapy"
+    }
+  ],
+  // For RecommendedResources
+  recommendedResources: [
+    {
+      id: 1,
+      title: "Managing Exam Anxiety",
+      category: "Article",
+      readTime: "5 min read"
+    },
+    {
+      id: 2,
+      title: "Deep Sleep Meditation",
+      category: "Audio",
+      readTime: "20 min"
+    }
+  ]
+};
+
 const Dashboard: React.FC = () => {
   const { 
     user, 
@@ -133,6 +201,8 @@ const Dashboard: React.FC = () => {
     dailyChallenge
   } = useStore();
   const navigate = useNavigate();
+
+  const [activeTab, setActiveTab] = useState('today');
 
   // Get current mood config (default to neutral if mood not set)
   const moodConfig = moodConfigs[currentMood || 'neutral'];
@@ -181,169 +251,155 @@ const Dashboard: React.FC = () => {
               <MoodSelector size="md" />
             </div>
           </div>
-
-          {/* User Stats Card */}
-          <motion.div 
-            className={`rounded-xl shadow-lg p-6 mb-8 ${moodConfig.cardBg} border ${moodConfig.accentBorder}`}
-            initial={moodConfig.animation.initial}
-            animate={moodConfig.animation.animate}
-            transition={moodConfig.animation.transition}
-          >
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-              <div className="mb-4 sm:mb-0">
-                <h2 className={`text-xl font-semibold mb-2 ${moodConfig.accentColor}`}>
-                  <Award className="inline-block mr-2 mb-1" size={22} />
-                  Your Progress
-                </h2>
-                <div className="flex items-center space-x-4">
-                  <div>
-                    <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-500'}`}>Daily Streak</p>
-                    <p className="text-2xl font-bold">{user?.streak || 0} days</p>
-                  </div>
-                  <div>
-                    <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-500'}`}>XP Level</p>
-                    <p className="text-2xl font-bold">{Math.floor((user?.xp || 0) / 100) + 1}</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="w-full sm:w-1/2">
-                <div className="flex justify-between mb-1">
-                  <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-500'}`}>
-                    XP: {(user?.xp || 0) % 100}/100
-                  </p>
-                  <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-500'}`}>
-                    Level {Math.floor((user?.xp || 0) / 100) + 1}
-                  </p>
-                </div>
-                <Progress value={(user?.xp || 0) % 100} className="h-2" indicatorColor={moodConfig.accentColor} />
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Daily Affirmation */}
-          <motion.div
-            className={`rounded-xl shadow-lg p-6 mb-8 ${moodConfig.cardBg} border ${moodConfig.accentBorder}`}
-            initial={moodConfig.animation.initial}
-            animate={moodConfig.animation.animate}
-            transition={{ ...moodConfig.animation.transition, delay: 0.1 }}
-          >
-            <h2 className={`text-xl font-semibold mb-3 ${moodConfig.accentColor}`}>
-              Today's Affirmation
-            </h2>
-            <p className={`text-lg italic ${darkMode ? 'text-white' : 'text-gray-700'}`}>
-              "{moodConfig.affirmation}"
-            </p>
-          </motion.div>
-
-          {/* Daily Challenge */}
-          <motion.div
-            className={`rounded-xl shadow-lg p-6 mb-8 ${moodConfig.cardBg} border ${moodConfig.accentBorder}`}
-            initial={moodConfig.animation.initial}
-            animate={moodConfig.animation.animate}
-            transition={{ ...moodConfig.animation.transition, delay: 0.2 }}
-          >
-            <h2 className={`text-xl font-semibold mb-3 ${moodConfig.accentColor} flex items-center`}>
-              <Calendar className="mr-2" size={20} />
-              Daily Challenge
-            </h2>
-            <p className={`mb-4 ${darkMode ? 'text-white' : 'text-gray-700'}`}>
-              {dailyChallengeText}
-            </p>
-            <Button 
-              onClick={() => completeChallenge()}
-              disabled={dailyChallenge?.completed}
-              className={`bg-gradient-to-r ${moodConfig.buttonGradient} text-white`}
-            >
-              <CheckCircle size={16} className="mr-2" />
-              {dailyChallenge?.completed ? 'Completed!' : 'Mark Complete (+10 XP)'}
-            </Button>
-          </motion.div>
-
-          {/* Quick Access Tools */}
-          <h2 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-            Quick Access
-          </h2>
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-            {[
-              { name: "Forum", icon: <MessageSquare size={24} />, path: "/forum" },
-              { name: "Resources", icon: <BookOpen size={24} />, path: "/resources" },
-              { name: "Emergency", icon: <AlertCircle size={24} />, path: "/emergency" },
-              { name: "Doctor", icon: <Phone size={24} />, path: "/doctor" },
-              { name: "Music", icon: <Music size={24} />, path: "/music" },
-              { name: "Body Map", icon: <Map size={24} />, path: "/body-map" }
-            ].map((item, index) => (
-              <motion.div
-                key={item.name}
-                whileHover={moodConfig.animation.hover}
-                initial={moodConfig.animation.initial}
-                animate={moodConfig.animation.animate}
-                transition={{ ...moodConfig.animation.transition, delay: 0.1 + index * 0.05 }}
-                onClick={() => navigate(item.path)}
-                className={`${moodConfig.cardBg} rounded-lg shadow-md p-4 flex flex-col items-center justify-center cursor-pointer`}
-              >
-                <div className={`mb-2 ${moodConfig.accentColor}`}>{item.icon}</div>
-                <span className={`text-sm ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                  {item.name}
-                </span>
-              </motion.div>
-            ))}
+          {/* Top Row Panels */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+            {/* Mood Tracker Panel - Top Left */}
+            <MoodTrackerPanel 
+              moodConfig={moodConfig} 
+              darkMode={darkMode} 
+              moodData={mockData.moodData} 
+            />
+            
+            {/* Welcome Section - Top Center */}
+            <WelcomeSection 
+              moodConfig={moodConfig} 
+              darkMode={darkMode} 
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              quoteOfTheDay={mockData.welcomeData.quoteOfTheDay}
+            />
+            
+            {/* Daily Challenge Card - Top Right */}
+            <DailyChallengeCard
+              moodConfig={moodConfig}
+              darkMode={darkMode}
+              challengeText={dailyChallengeText}
+              onComplete={completeChallenge}
+              isCompleted={dailyChallenge?.completed || false}
+            />
           </div>
 
-          {/* Wellbeing Activities */}
-          <h2 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-            Wellbeing Activities
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {[
-              { 
-                name: "Time Capsule", 
-                icon: <Clock size={24} />, 
-                path: "/time-capsule",
-                description: "Save thoughts to revisit in the future" 
-              },
-              { 
-                name: "Vent Box", 
-                icon: <Mic size={24} />, 
-                path: "/vent-box",
-                description: "Record your thoughts and let them go" 
-              },
-              { 
-                name: "Mood Journal", 
-                icon: <HeartPulse size={24} />, 
-                path: "/mood-tracker",
-                description: "Track your emotional journey" 
-              }
-            ].map((item, index) => (
-              <motion.div
-                key={item.name}
-                whileHover={moodConfig.animation.hover}
-                initial={moodConfig.animation.initial}
-                animate={moodConfig.animation.animate}
-                transition={{ ...moodConfig.animation.transition, delay: 0.3 + index * 0.1 }}
-                onClick={() => navigate(item.path)}
-                className={`${moodConfig.cardBg} rounded-xl shadow-lg p-5 cursor-pointer border ${moodConfig.accentBorder}`}
-              >
-                <div className="flex items-start mb-3">
-                  <div className={`p-3 rounded-lg ${moodConfig.accentColor} bg-opacity-20`}>
-                    {item.icon}
-                  </div>
-                  <div className="ml-3">
-                    <h3 className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+          {/* Middle Row - Progress & Quick Access */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
+            {/* Your Progress - Bottom Left */}
+            <ProgressPanel 
+              moodConfig={moodConfig} 
+              darkMode={darkMode} 
+              user={user}
+              completedTasks={mockData.progressData.completedTasks}
+              totalTasks={mockData.progressData.totalTasks}
+              achievements={mockData.progressData.achievements}
+            />
+
+            {/* Quick Access Tools */}
+            <div className={`rounded-xl shadow-lg p-6 ${moodConfig.cardBg} border ${moodConfig.accentBorder}`}>
+              <h2 className={`text-xl font-semibold mb-4 ${moodConfig.accentColor}`}>
+                Quick Access
+              </h2>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {[
+                  { name: "Forum", icon: <MessageSquare size={24} />, path: "/forum" },
+                  { name: "Resources", icon: <BookOpen size={24} />, path: "/resources" },
+                  { name: "Emergency", icon: <AlertCircle size={24} />, path: "/emergency" },
+                  { name: "Doctor", icon: <Phone size={24} />, path: "/doctor" },
+                  { name: "Music", icon: <Music size={24} />, path: "/music" },
+                  { name: "Support", icon: <Info size={24} />, path: "/support" }
+                ].map((item, index) => (
+                  <motion.div
+                    key={item.name}
+                    whileHover={{ 
+                      y: -5, 
+                      boxShadow: `0 4px 12px rgba(0, 0, 0, 0.1)` 
+                    }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ 
+                      duration: 0.3, 
+                      delay: 0.1 + index * 0.05 
+                    }}
+                    onClick={() => navigate(item.path)}
+                    className={`bg-${moodConfig.accentColor.split('-')[1]}-50 dark:bg-${moodConfig.accentColor.split('-')[1]}-900/20 rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer border border-transparent hover:border-${moodConfig.accentColor.split('-')[1]}-300`}
+                  >
+                    <div className={`mb-2 ${moodConfig.accentColor}`}>{item.icon}</div>
+                    <span className={`text-sm ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
                       {item.name}
-                    </h3>
-                    <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                      {item.description}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex justify-end">
-                  <ArrowRight size={16} className={moodConfig.accentColor} />
-                </div>
-              </motion.div>
-            ))}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+            {/* Upcoming Sessions - Bottom Center */}
+            <UpcomingSessions
+              moodConfig={moodConfig}
+              darkMode={darkMode}
+              sessions={mockData.upcomingSessions}
+            />
+            
+            {/* Recommended Resources - Bottom Right */}
+            <RecommendedResources
+              moodConfig={moodConfig}
+              darkMode={darkMode}
+              resources={mockData.recommendedResources}
+            />
+            
+            {/* Wellbeing Activities */}
+            <div>
+              <h2 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                Wellbeing Activities
+              </h2>
+              
+              <div className="grid grid-cols-1 gap-3">
+                {[
+                  { 
+                    name: "Time Capsule", 
+                    icon: <Clock size={24} />, 
+                    path: "/time-capsule",
+                    description: "Save thoughts to revisit in the future" 
+                  },
+                  { 
+                    name: "Vent Box", 
+                    icon: <Mic size={24} />, 
+                    path: "/vent-box",
+                    description: "Record your thoughts and let them go" 
+                  },
+                  { 
+                    name: "Mood Journal", 
+                    icon: <HeartPulse size={24} />, 
+                    path: "/mood-tracker",
+                    description: "Track your emotional journey" 
+                  }
+                ].map((item, index) => (
+                  <motion.div
+                    key={item.name}
+                    whileHover={moodConfig.animation.hover}
+                    initial={moodConfig.animation.initial}
+                    animate={moodConfig.animation.animate}
+                    transition={{ ...moodConfig.animation.transition, delay: 0.3 + index * 0.1 }}
+                    onClick={() => navigate(item.path)}
+                    className={`${moodConfig.cardBg} rounded-xl shadow p-4 cursor-pointer border ${moodConfig.accentBorder} flex items-center`}
+                  >
+                    <div className={`p-2 rounded-lg mr-3 ${moodConfig.accentColor} bg-opacity-20`}>
+                      {item.icon}
+                    </div>
+                    <div>
+                      <h3 className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                        {item.name}
+                      </h3>
+                      <p className={`text-xs ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        {item.description}
+                      </p>
+                    </div>
+                    <ArrowRight size={16} className={`${moodConfig.accentColor} ml-auto`} />
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           </div>
         </motion.div>
       </AnimatePresence>
