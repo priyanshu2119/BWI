@@ -432,6 +432,18 @@ const DoctorConsult: React.FC = () => {
     );
   }
   
+  // Helper function to check if selected date is today
+  const isDateToday = () => {
+    const today = new Date();
+    
+    return (
+      selectedDate &&
+      today.getDate() === selectedDate.getDate() &&
+      today.getMonth() === selectedDate.getMonth() &&
+      today.getFullYear() === selectedDate.getFullYear()
+    );
+  };
+  
   // Main booking flow
   return (
     <Layout>
@@ -1305,24 +1317,12 @@ const DoctorCalendar: React.FC<{
         </div>
       ))}
       
-      <div className="mt-3 flex items-center">
-        <div className={`w-3 h-3 rounded-full ${
-          darkMode ? 'bg-purple-500 bg-opacity-40' : 'bg-purple-200'
-        } mr-1`} />
-        <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-          Available Days
-        </span>
-      </div>
-    </div>
-  );
-};
-
-// Helper function to check if selected date is today
+export default DoctorConsult;f selected date is today
 const isDateToday = () => {
   const today = new Date();
-  const selectedDate = new Date(); // Replace with your actual selected date
   
   return (
+    selectedDate &&
     today.getDate() === selectedDate.getDate() &&
     today.getMonth() === selectedDate.getMonth() &&
     today.getFullYear() === selectedDate.getFullYear()
