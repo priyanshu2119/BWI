@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, useAnimation, useTransform, useScroll, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { 
   Brain, 
   BarChart2, 
@@ -246,7 +246,7 @@ const LandingPage: React.FC = () => {
       <section className="min-h-screen flex flex-col items-center justify-center px-4 text-center relative overflow-hidden">
         <motion.div 
           style={{ y: headerY }}
-          className="absolute w-full h-full top-0 left-0 z-0 opacity-20 pointer-events-none"
+          className="absolute w-full h-full top-0 left-0 z-0 opacity: 20 pointer-events-none"
         >
           {[...Array(20)].map((_, i) => (
             <motion.div
@@ -441,6 +441,49 @@ const LandingPage: React.FC = () => {
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <TopForumPosts />
+        </div>
+      </section>
+
+      {/* Friends Chat Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            key="friends-chat"
+            whileHover={{ scale: 1.05 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className={`relative rounded-xl overflow-hidden ${
+              darkMode ? 'bg-gray-800 hover:bg-gray-750' : 'bg-white hover:bg-gray-50'
+            } shadow-sm hover:shadow-md transition-all duration-200`}
+          >
+            <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-400 to-indigo-500`}></div>
+            
+            <Link to="/friends" className="block p-5">
+              <div className="flex items-start">
+                <div className={`p-3 rounded-lg mr-4 ${
+                  darkMode ? 'bg-gray-700' : 'bg-purple-100'
+                }`}>
+                  <MessageSquare size={24} className={darkMode ? 'text-purple-400' : 'text-purple-600'} />
+                </div>
+                
+                <div>
+                  <div className="flex items-center">
+                    <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      Friends Chat
+                    </h3>
+                    <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                      E2E Encrypted
+                    </span>
+                  </div>
+                  
+                  <p className={`mt-1 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Secure, encrypted messaging with trusted friends
+                  </p>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
         </div>
       </section>
       

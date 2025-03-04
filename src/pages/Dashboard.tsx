@@ -305,7 +305,15 @@ const Dashboard: React.FC = () => {
                   { name: "Emergency", icon: <AlertCircle size={24} />, path: "/emergency" },
                   { name: "Doctor", icon: <Phone size={24} />, path: "/doctor" },
                   { name: "Music", icon: <Music size={24} />, path: "/music" },
-                  { name: "Support", icon: <Info size={24} />, path: "/support" }
+                  { name: "Support", icon: <Info size={24} />, path: "/support" },
+                  { 
+                    name: "Friends Chat", 
+                    icon: <MessageSquare size={24} />, 
+                    path: "/friends",
+                    description: "Secure, encrypted messaging with trusted friends",
+                    badge: "E2E Encrypted",
+                    gradient: "from-purple-400 to-indigo-500"
+                  }
                 ].map((item, index) => (
                   <motion.div
                     key={item.name}
