@@ -68,12 +68,13 @@ interface State {
   addBodyMapPoint: (moodEntryId: string, point: BodyMapPoint) => void;
   addVentBoxRecording: (duration: number) => void;
   deleteVentBoxRecording: (recordingId: string) => void;
-  waterGarden: () => void;
+  waterGarden: (plantId: string) => void;
   sendHeartToGlobalEmotion: (emotionId: string) => void;
   setShowFlashcards: (show: boolean) => void;
   incrementStreak: () => void;
   setUser: (userData: User) => void;
   logout: () => void;
+  plantInGarden: (plant: { id: string; type: string; stage: number; plantedAt: number; lastWatered: number }) => void;
 }
 
 // Mock initial data
@@ -153,7 +154,8 @@ const mockUser: User = {
         id: '1',
         type: 'tree',
         stage: 2,
-        plantedAt: Date.now() - 86400000 * 5
+        plantedAt: Date.now() - 86400000 * 5,
+        lastWatered: Date.now() - 86400000
       }
     ],
     lastWatered: Date.now() - 86400000
@@ -730,33 +732,42 @@ const useStore = create<State>()(
         }
       })),
       
-      waterGarden: () => set((state) => {
-        // Advance plant growth if it's been at least a day since last watered
-        const daysSinceLastWatered = (Date.now() - state.user.gardenProgress.lastWatered) / 86400000;
-        
-        if (daysSinceLastWatered < 1) return state;
-        
-        const updatedPlants = state.user.gardenProgress.plants.map(plant => {
-          if (plant.stage < 5) {
-            return {
-              ...plant,
-              stage: plant.stage + 1
-            };
-          }
-          return plant;
-        });
-        
-        return {
-          user: {
-            ...state.user,
-            gardenProgress: {
-              ...state.user.gardenProgress,
-              plants: updatedPlants,
-              lastWatered: Date.now()
+      waterGarden: (plantId) => {
+        set((state) => {
+          // Find the plant to water
+          const updatedPlants = state.user.gardenProgress?.plants?.map(plant => {
+            if (plant.id === plantId) {
+              // Advance growth stage if enough time has passed
+              const timeSinceLastWatered = Date.now() - plant.lastWatered;
+              const daysSinceWatered = timeSinceLastWatered / (1000 * 60 * 60 * 24);
+              
+              // Advance stage if plant was watered 2+ days ago and not fully grown
+              let newStage = plant.stage;
+              if (daysSinceWatered >= 2 && plant.stage < 5) {
+                newStage = plant.stage + 1;
+              }
+              
+              return {
+                ...plant,
+                lastWatered: Date.now(),
+                stage: newStage
+              };
             }
-          }
-        };
-      }),
+            return plant;
+          }) || [];
+          
+          return {
+            user: {
+              ...state.user,
+              gardenProgress: {
+                ...state.user.gardenProgress,
+                plants: updatedPlants,
+                lastWatered: Date.now()
+              }
+            }
+          };
+        })
+      },
       
       sendHeartToGlobalEmotion: (emotionId) => set((state) => ({
         globalEmotions: state.globalEmotions.map(emotion => 
@@ -786,7 +797,19 @@ const useStore = create<State>()(
           lastActive: '',
           isAuthenticated: false
         }
-      })
+      }),
+
+      plantInGarden: (plant) => {
+        set((state) => ({
+          user: {
+            ...state.user,
+            gardenProgress: {
+              ...state.user.gardenProgress,
+              plants: [...(state.user.gardenProgress?.plants || []), plant]
+            }
+          }
+        }))
+      }
     }),
     {
       name: 'mental-health-hub-storage'
