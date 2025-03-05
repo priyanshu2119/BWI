@@ -32,8 +32,17 @@ const GROWTH_STAGES = {
   BLOOMING: 5
 };
 
-// Tree component with growth stages
-const GardenTree = ({ position, scale, type, growthStage, onClick, color }) => {
+// Update the GardenTree component with proper type annotations
+interface GardenTreeProps {
+  position: [number, number, number];
+  scale: number;
+  type: string;
+  growthStage: number;
+  onClick?: () => void;
+  color?: number | string;
+}
+
+const GardenTree: React.FC<GardenTreeProps> = ({ position, scale, type, growthStage, onClick, color }) => {
   const meshRef = useRef();
   const groupRef = useRef();
   
@@ -53,7 +62,9 @@ const GardenTree = ({ position, scale, type, growthStage, onClick, color }) => {
     // Base colors with slight variations
     const leafColors = {
       tree: new THREE.Color(color || 0x4ade80),
+      'emotion-tree': new THREE.Color(color || 0x4ade80),
       flower: new THREE.Color(color || 0xfbbf24),
+      'achievement-flower': new THREE.Color(color || 0xfbbf24),
       bush: new THREE.Color(color || 0x22c55e),
       herb: new THREE.Color(color || 0x34d399)
     };
@@ -79,17 +90,17 @@ const GardenTree = ({ position, scale, type, growthStage, onClick, color }) => {
           <group ref={meshRef} position={[0, 0.8, 0]}>
             {growthStage >= GROWTH_STAGES.SPROUT && (
               <mesh castShadow>
-                {type === PLANT_TYPES.TREE && (
+                {type === PLANT_TYPES.TREE || type === 'emotion-tree' ? (
                   <coneGeometry args={[0.6, 1.2, 8]} />
-                )}
-                {type === PLANT_TYPES.BUSH && (
-                  <sphereGeometry args={[0.6, 16, 16]} />
-                )}
-                {type === PLANT_TYPES.FLOWER && (
+                ) : type === PLANT_TYPES.FLOWER || type === 'achievement-flower' ? (
                   <dodecahedronGeometry args={[0.6, 0]} />
-                )}
-                {type === PLANT_TYPES.HERB && (
+                ) : type === PLANT_TYPES.BUSH ? (
+                  <sphereGeometry args={[0.6, 16, 16]} />
+                ) : type === PLANT_TYPES.HERB ? (
                   <octahedronGeometry args={[0.5, 0]} />
+                ) : (
+                  // Default fallback
+                  <coneGeometry args={[0.6, 1.2, 8]} />
                 )}
                 <meshStandardMaterial 
                   color={getTreeColor()} 
@@ -122,8 +133,12 @@ const GardenTree = ({ position, scale, type, growthStage, onClick, color }) => {
   );
 };
 
-// Ground plane component
-const Ground = ({ onPlant }) => {
+// Update the Ground component
+interface GroundProps {
+  onPlant: (position: [number, number, number]) => void;
+}
+
+const Ground: React.FC<GroundProps> = ({ onPlant }) => {
   const [ref] = usePlane(() => ({ 
     rotation: [-Math.PI / 2, 0, 0],
     position: [0, -0.1, 0]
@@ -165,8 +180,12 @@ const Ground = ({ onPlant }) => {
   );
 };
 
-// Sky with day/night cycle
-const DayNightCycle = ({ timeOfDay }) => {
+// Update DayNightCycle component
+interface DayNightCycleProps {
+  timeOfDay: number;
+}
+
+const DayNightCycle: React.FC<DayNightCycleProps> = ({ timeOfDay }) => {
   const sunPosition = [
     100 * Math.cos(timeOfDay * Math.PI),
     100 * Math.sin(timeOfDay * Math.PI),
@@ -274,10 +293,23 @@ const CameraControls = ({ darkMode }) => {
   );
 };
 
-// Main TherapyGarden component
+// Add this optimization function
+const optimizeRendering = (state) => {
+  // Adjust renderer settings based on device capability
+  if (state.gl) {
+    state.gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    
+    // Update quality setting based on device performance
+    if (window.devicePixelRatio < 1.5) {
+      setQuality('low');
+    }
+  }
+};
+
+// Main TherapyGarden component with proper data handling
 const TherapyGarden: React.FC = () => {
-  const { user, waterGarden, plantInGarden, darkMode, currentMood } = useStore();
-  const { gardenProgress = { plants: [], lastWatered: 0 } } = user;
+  const { user = {}, waterGarden, plantInGarden, darkMode = false, currentMood = 'neutral' } = useStore();
+  const { gardenProgress = { plants: [], lastWatered: 0 } } = user || {};
   
   // State for garden interactions
   const [plantingMode, setPlantingMode] = useState(false);
@@ -285,7 +317,27 @@ const TherapyGarden: React.FC = () => {
   const [dayTime, setDayTime] = useState(0.3); // Start at morning
   const [wateringPlant, setWateringPlant] = useState(null);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [quality, setQuality] = useState('high');
   
+  // Check if WebGL is supported
+  const [webGLSupported] = useState(() => {
+    try {
+      const canvas = document.createElement('canvas');
+      return !!(window.WebGLRenderingContext && 
+        (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+    } catch(e) {
+      return false;
+    }
+  });
+  
+  // Loading state management
+  useEffect(() => {
+    if (user && user.id) {
+      setIsLoading(false);
+    }
+  }, [user]);
+
   // Generate plant color based on user mood
   const getMoodColor = () => {
     const moodColors = {
@@ -337,10 +389,19 @@ const TherapyGarden: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
   
-  // Calculate if user can plant a new seed (based on mood entries or achievements)
+  // Calculate if user can plant a new seed
   const canPlant = () => {
-    // Limit plants based on user level or achievements
-    return gardenProgress.plants.length < user.level * 3;
+    if (!user || !user.level) return false;
+    // Limit plants based on user level
+    return (gardenProgress?.plants?.length || 0) < (user.level * 3);
+  };
+
+  // Calculate if user can water plants today
+  const canWater = () => {
+    if (!gardenProgress) return false;
+    const lastWatered = gardenProgress.lastWatered || 0;
+    const today = new Date().setHours(0, 0, 0, 0);
+    return new Date(lastWatered).setHours(0, 0, 0, 0) < today;
   };
   
   return (
@@ -498,49 +559,66 @@ const TherapyGarden: React.FC = () => {
                 </div>
                 
                 {/* 3D Garden Scene */}
-                <Canvas shadows gl={{ antialias: true }}>
-                  <Suspense fallback={<LoadingIndicator />}>
-                    <fog attach="fog" args={[0xffffff, 0.1, 100]} />
-                    <Physics>
-                      <Ground onPlant={handlePlantSeed} />
+                {isLoading ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
+                    <p className={darkMode ? 'text-white' : 'text-gray-900'}>Loading your garden...</p>
+                  </div>
+                ) : !webGLSupported ? (
+                  <div className="flex items-center justify-center h-full p-6 text-center">
+                    <div>
+                      <p className={`text-lg mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                        Your browser doesn't support WebGL
+                      </p>
+                      <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        Try using a modern browser like Chrome, Firefox, or Edge to view the 3D garden.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <Canvas 
+                    shadows 
+                    gl={{ antialias: true }} 
+                    onCreated={optimizeRendering}
+                  >
+                    <Suspense fallback={<LoadingIndicator />}>
+                      <fog attach="fog" args={[0xffffff, 0.1, 100]} />
+                      <Physics>
+                        <Ground onPlant={handlePlantSeed} />
+                        
+                        {/* Safely render plants with optional chaining */}
+                        {gardenProgress?.plants?.map((plant, index) => (
+                          <GardenTree
+                            key={plant.id}
+                            position={plant.position}
+                            scale={1}
+                            type={plant.type}
+                            growthStage={plant.stage}
+                            color={plant.color}
+                            onClick={() => handleWaterPlant(plant.id)}
+                          />
+                        ))}
+                        
+                        {wateringPlant && (
+                          <Sparkles
+                            position={gardenProgress?.plants?.find(p => p.id === wateringPlant)?.position}
+                            count={20}
+                            scale={1}
+                            size={0.5}
+                            speed={0.5}
+                            color={new THREE.Color(0x3b82f6)}
+                          />
+                        )}
+                        
+                        <Water />
+                        <DayNightCycle timeOfDay={dayTime} />
+                        <Environment preset="park" />
+                      </Physics>
                       
-                      {/* Plants from user's garden progress */}
-                      {gardenProgress.plants.map((plant, index) => (
-                        <GardenTree
-                          key={plant.id}
-                          position={plant.position}
-                          scale={1}
-                          type={plant.type}
-                          growthStage={plant.stage}
-                          color={plant.color}
-                          onClick={() => handleWaterPlant(plant.id)}
-                        />
-                      ))}
-                      
-                      {/* Water animation when watering plants */}
-                      {wateringPlant && (
-                        <Sparkles
-                          position={gardenProgress.plants.find(p => p.id === wateringPlant)?.position}
-                          count={20}
-                          scale={1}
-                          size={0.5}
-                          speed={0.5}
-                          color={new THREE.Color(0x3b82f6)}
-                        />
-                      )}
-                      
-                      {/* Water feature */}
-                      <Water />
-                      
-                      {/* Environment lighting */}
-                      <DayNightCycle timeOfDay={dayTime} />
-                      <Environment preset="park" />
-                    </Physics>
-                    
-                    {/* Camera controls */}
-                    <CameraControls darkMode={darkMode} />
-                  </Suspense>
-                </Canvas>
+                      <CameraControls darkMode={darkMode} />
+                    </Suspense>
+                  </Canvas>
+                )}
                 
                 {plantingMode && (
                   <div className="absolute left-0 bottom-0 m-4 p-3 rounded-lg bg-black bg-opacity-70 text-white text-sm">
@@ -591,7 +669,7 @@ const TherapyGarden: React.FC = () => {
                     <Droplets className="flex-shrink-0 mr-3 mt-1" size={18} />
                     <div>
                       <p className="font-medium">Water Your Plants</p>
-                      <p className="text-sm">Click on any plant to water it. Regular watering helps them grow faster.</p>
+                      <p className="text-sm">Click on any plant to water it. Regular watering helps plants grow faster.</p>
                     </div>
                   </div>
                   

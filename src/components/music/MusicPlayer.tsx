@@ -719,21 +719,17 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
     onTrackChange(newIndex);
   }, [currentTrackIndex, isShuffle, onTrackChange, repeatMode, tracks.length]);
   
-  const handleTimeUpdate = useCallback(() => {
-    if (!audioRef.current || isDraggingProgress) return;
-    
-    setCurrentTime(audioRef.current.currentTime);
-    setDuration(audioRef.current.duration);
-    
-    // When near the end of the track, prepare for transition
-    if (nextTrackPreloaded && 
-        audioRef.current.duration > 0 && 
-        audioRef.current.currentTime >= audioRef.current.duration - 2) {
-      if (nextAudioRef.current) {
-        nextAudioRef.current.currentTime = 0;
-      }
-    }
-  }, [isDraggingProgress, nextTrackPreloaded]);
+  const handleTimeUpdate = (e: React.SyntheticEvent<HTMLAudioElement>) => {
+    const audio = e.currentTarget;
+    setCurrentTime(audio.currentTime);
+    setDuration(audio.duration);
+  };
+
+  const handleLoadedMetadata = (e: React.SyntheticEvent<HTMLAudioElement>) => {
+    setAudioElementReady(true);
+    const audio = e.currentTarget;
+    setDuration(audio.duration);
+  };
   
   const handleSeek = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const newTime = parseFloat(e.target.value);
@@ -811,7 +807,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
         src={currentTrack.audioUrl}
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleNext}
-        onLoadedMetadata={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
         preload="auto"
       />
       

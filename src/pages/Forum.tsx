@@ -28,11 +28,11 @@ const Forum: React.FC = () => {
     
     // For demo purposes, we'll create a mock WebSocket implementation
     class MockWebSocket {
-      onopen: (() => void) | null = null;
-      onmessage: ((event: any) => void) | null = null;
-      onclose: (() => void) | null = null;
-      onerror: (() => void) | null = null;
-      readyState = 1;
+      onopen: ((this: WebSocket, ev: Event) => any) | null = null;
+      onmessage: ((this: WebSocket, ev: MessageEvent) => any) | null = null;
+      onclose: ((this: WebSocket, ev: CloseEvent) => any) | null = null;
+      onerror: ((this: WebSocket, ev: Event) => any) | null = null;
+      readyState: number = 1;
 
       constructor() {
         setTimeout(() => {
@@ -40,7 +40,7 @@ const Forum: React.FC = () => {
         }, 500);
       }
 
-      send(data: string) {
+      send(data: string): void {
         // Mock receiving your own message back with server-generated ID
         setTimeout(() => {
           if (this.onmessage) {
@@ -62,7 +62,7 @@ const Forum: React.FC = () => {
         }, 300);
       }
 
-      close() {
+      close(): void {
         this.onclose && this.onclose();
       }
     }

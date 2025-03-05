@@ -245,6 +245,16 @@ const BodyMap: React.FC = () => {
     }
     return "General body";
   };
+
+  // For input event handlers
+  const handleIntensityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIntensity(parseInt(e.target.value));
+  };
+
+  // For button click events
+  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // ...existing code
+  };
   
   return (
     <Layout>
@@ -477,7 +487,7 @@ const BodyMap: React.FC = () => {
                         min="1"
                         max="10"
                         value={intensity}
-                        onChange={(e) => setIntensity(parseInt(e.target.value))}
+                        onChange={handleIntensityChange}
                         className={`w-full h-2 rounded-full appearance-none cursor-pointer ${
                           darkMode ? 'bg-gray-700' : 'bg-gray-200'
                         }`}
@@ -711,9 +721,8 @@ const BodyMap: React.FC = () => {
                     }}
                     className="flex-1"
                     icon={<ArrowRight size={16} />}
-                    iconPosition="right"
                   >
-                    Next
+                    Next <ArrowRight size={16} className="ml-1 inline" />
                   </Button>
                 </div>
               </motion.div>
