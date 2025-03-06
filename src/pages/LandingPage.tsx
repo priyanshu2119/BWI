@@ -15,7 +15,8 @@ import {
   Clock,
   Map,
   Mic,
-  AlertTriangle
+  AlertTriangle,
+  Leaf // Add this
 } from 'lucide-react';
 import Button from '../components/ui/Button';
 import MoodSelector from '../components/ui/MoodSelector';
@@ -162,6 +163,24 @@ const LandingPage: React.FC = () => {
       description: "Mood-based playlists to help you relax",
       icon: <Music size={32} className={`mb-3 ${textColorClass}`} />,
       path: "/music"
+    },
+    {
+      title: "Friends Chat",
+      description: "Secure, encrypted messaging with trusted friends",
+      icon: <Users size={32} className={`mb-3 ${textColorClass}`} />,
+      path: "/friends"
+    },
+    {
+      title: "Therapy Garden",
+      description: "Grow and nurture your mental wellness garden",
+      icon: <Leaf size={32} className={`mb-3 ${textColorClass}`} />,
+      path: "/therapy-garden"
+    },
+    {
+      title: "Virtual Doctor",
+      description: "Connect with mental health professionals",
+      icon: <Video size={32} className={`mb-3 ${textColorClass}`} />,
+      path: "/doctor"
     }
   ];
 
