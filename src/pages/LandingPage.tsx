@@ -602,57 +602,81 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Contact/Help Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate={controls}
+      {/* Footer Section */}
+      <footer className="py-12 px-4 bg-gray-100 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div>
+          <h3 className="text-lg font-semibold mb-4 flex items-center">
+            <Brain size={24} className="mr-2" style={{ color: colors[0] }} /> Mindful
+          </h3>
+          <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-4`}>
+            Your personal mental health companion for university life.
+          </p>
+          <div className="flex space-x-4">
+            {/* Social Media Icons */}
+            {['instagram', 'twitter', 'facebook'].map((social) => (
+          <motion.a 
+            key={social}
+            href={`#${social}`} 
+            whileHover={{ y: -3 }}
+            className={`p-2 rounded-full ${darkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-200 hover:bg-gray-300'}`}
           >
-            <motion.h2 
-              variants={itemVariants}
-              className="text-3xl md:text-4xl font-bold mb-4"
-              style={{ color: colors[0] }}
-            >
-              We're Here For You
-            </motion.h2>
-            <motion.p 
-              variants={itemVariants}
-              className={`text-xl mb-8 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}
-            >
-              Remember, seeking help is a sign of strength, not weakness.
-            </motion.p>
-            
-            <motion.div
-              variants={itemVariants}
-              className="flex flex-col md:flex-row gap-4 justify-center"
-            >
-              <Button 
-                onClick={() => navigate('/support')}
-                size="md"
-                style={{ 
-                  background: `linear-gradient(to right, ${colors[0]}, ${colors[1]})`,
-                  border: 'none'
-                }}
-                className="flex items-center justify-center gap-2"
-              >
-                <MessageSquare size={18} />
-                Contact Support
-              </Button>
-              
-              <Button 
-                onClick={() => navigate('/resources')}
-                size="md"
-                variant="outline"
-                className="flex items-center justify-center gap-2"
-              >
-                <BookOpen size={18} />
-                Mental Health Resources
-              </Button>
-            </motion.div>
-          </motion.div>
+            <span className="sr-only">{social}</span>
+            <div style={{ width: 20, height: 20, background: `linear-gradient(to right, ${colors[0]}, ${colors[1]})` }} 
+             className="rounded-full" />
+          </motion.a>
+            ))}
+          </div>
         </div>
-      </section>
+        
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Features</h3>
+          <ul className={`space-y-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            {['Mood Tracker', 'Community Forum', 'Therapy Garden', 'Vent Box'].map(item => (
+          <li key={item}>
+            <Link to={`/${item.toLowerCase().replace(' ', '-')}`} className="hover:underline">
+              {item}
+            </Link>
+          </li>
+            ))}
+          </ul>
+        </div>
+        
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Resources</h3>
+          <ul className={`space-y-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            {['Help Center', 'Mental Health Articles', 'Crisis Support', 'FAQ'].map(item => (
+          <li key={item}>
+            <Link to={`/${item.toLowerCase().replace(' ', '-')}`} className="hover:underline">
+              {item}
+            </Link>
+          </li>
+            ))}
+          </ul>
+        </div>
+        
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Legal</h3>
+          <ul className={`space-y-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            {['Privacy Policy', 'Terms of Service', 'Cookie Policy', 'GDPR'].map(item => (
+          <li key={item}>
+            <Link to={`/${item.toLowerCase().replace(' ', '-')}`} className="hover:underline">
+              {item}
+            </Link>
+          </li>
+            ))}
+          </ul>
+        </div>
+          </div>
+          
+          <div className={`mt-12 pt-6 border-t ${darkMode ? 'border-gray-800' : 'border-gray-200'} text-center`}>
+        <p className={`${darkMode ? 'text-gray-500' : 'text-gray-600'}`}>
+          &copy; {new Date().getFullYear()} Mindful. All rights reserved.
+        </p>
+          </div>
+        </div>
+      </footer>
       {/* Other sections remain the same */}
     </div>
   );
