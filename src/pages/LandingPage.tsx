@@ -464,7 +464,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Friends Chat Section */}
-      <section className="py-20 px-4">
+      {/* <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
             key="friends-chat"
@@ -504,8 +504,155 @@ const LandingPage: React.FC = () => {
             </Link>
           </motion.div>
         </div>
+      </section> */}
+      {/* Wellness Tips Section */}
+      <section className="py-20 px-4 bg-gray-50 dark:bg-gray-800">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate={controls}
+            className="text-center mb-12"
+          >
+            <motion.h2 
+              variants={itemVariants}
+              className="text-3xl md:text-4xl font-bold mb-4"
+              style={{ color: colors[0] }}
+            >
+              Daily Wellness Tips
+            </motion.h2>
+            <motion.p 
+              variants={itemVariants}
+              className={`text-xl max-w-3xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}
+            >
+              Simple practices to incorporate into your daily routine
+            </motion.p>
+          </motion.div>
+          
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate={controls}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            {[
+              {
+                title: "Mindful Breathing",
+                description: "Take 5 deep breaths, focusing only on your breathing to center yourself.",
+                icon: <BookOpen size={24} />
+              },
+              {
+                title: "Gratitude Practice",
+                description: "Write down three things you're grateful for each morning.",
+                icon: <Award size={24} />
+              },
+              {
+                title: "Digital Sunset",
+                description: "Turn off screens 30 minutes before bed for better sleep quality.",
+                icon: <Brain size={24} />
+              }
+            ].map((tip, index) => (
+              <motion.div
+                key={`tip-${index}`}
+                variants={itemVariants}
+                className={`p-6 rounded-xl bg-white dark:bg-gray-800 shadow-lg border border-transparent`}
+                whileHover={{ 
+                  y: -5,
+                  borderColor: colors[0],
+                  boxShadow: `0 15px 30px -10px ${colors[0]}33`,
+                  transition: { duration: 0.2 } 
+                }}
+              >
+                <div className="flex items-center mb-4">
+                  <div 
+                    className="p-3 rounded-full mr-3"
+                    style={{ background: `linear-gradient(135deg, ${colors[0]}22, ${colors[1]}44)` }}
+                  >
+                    {React.cloneElement(tip.icon, {
+                      style: { color: colors[0] }
+                    })}
+                  </div>
+                  <h3 className={`text-lg font-semibold ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+                    {tip.title}
+                  </h3>
+                </div>
+                <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
+                  {tip.description}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
+          
+          <motion.div
+            variants={itemVariants}
+            className="mt-10 text-center"
+          >
+            <Button 
+              onClick={() => navigate('/wellness-tips')}
+              size="md"
+              style={{ 
+                background: `linear-gradient(to right, ${colors[0]}, ${colors[1]})`,
+                border: 'none'
+              }}
+            >
+              View All Wellness Tips
+            </Button>
+          </motion.div>
+        </div>
       </section>
-      
+
+      {/* Contact/Help Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate={controls}
+          >
+            <motion.h2 
+              variants={itemVariants}
+              className="text-3xl md:text-4xl font-bold mb-4"
+              style={{ color: colors[0] }}
+            >
+              We're Here For You
+            </motion.h2>
+            <motion.p 
+              variants={itemVariants}
+              className={`text-xl mb-8 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}
+            >
+              Remember, seeking help is a sign of strength, not weakness.
+            </motion.p>
+            
+            <motion.div
+              variants={itemVariants}
+              className="flex flex-col md:flex-row gap-4 justify-center"
+            >
+              <Button 
+                onClick={() => navigate('/support')}
+                size="md"
+                style={{ 
+                  background: `linear-gradient(to right, ${colors[0]}, ${colors[1]})`,
+                  border: 'none'
+                }}
+                className="flex items-center justify-center gap-2"
+              >
+                <MessageSquare size={18} />
+                Contact Support
+              </Button>
+              
+              <Button 
+                onClick={() => navigate('/resources')}
+                size="md"
+                variant="outline"
+                className="flex items-center justify-center gap-2"
+              >
+                <BookOpen size={18} />
+                Mental Health Resources
+              </Button>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
       {/* Other sections remain the same */}
     </div>
   );
