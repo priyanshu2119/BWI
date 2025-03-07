@@ -602,6 +602,173 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Contact/Help Section */}
+      <section className="py-20 px-4 bg-white dark:bg-gray-900">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate={controls}
+            className="text-center mb-12"
+          >
+            <motion.h2 
+              variants={itemVariants}
+              className="text-3xl md:text-4xl font-bold mb-4"
+              style={{ color: colors[0] }}
+            >
+              Need Help?
+            </motion.h2>
+            <motion.p 
+              variants={itemVariants}
+              className={`text-xl max-w-3xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}
+            >
+              Our team is here to support your mental health journey
+            </motion.p>
+          </motion.div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Contact Form */}
+            <motion.div
+              variants={itemVariants}
+              className={`p-6 rounded-xl bg-white dark:bg-gray-800 shadow-lg`}
+            >
+              <h3 className={`text-2xl font-semibold mb-4 ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+                Contact Us
+              </h3>
+              <form className="space-y-4">
+                <div>
+                  <label 
+                    htmlFor="name" 
+                    className={`block mb-2 text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                  >
+                    Your Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    className={`w-full p-3 rounded-md border ${
+                      darkMode 
+                        ? 'bg-gray-700 border-gray-600 text-white' 
+                        : 'bg-gray-50 border-gray-300 text-gray-900'
+                    }`}
+                    placeholder="John Doe"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label 
+                    htmlFor="email" 
+                    className={`block mb-2 text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                  >
+                    Your Email
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    className={`w-full p-3 rounded-md border ${
+                      darkMode 
+                        ? 'bg-gray-700 border-gray-600 text-white' 
+                        : 'bg-gray-50 border-gray-300 text-gray-900'
+                    }`}
+                    placeholder="name@example.com"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label 
+                    htmlFor="message" 
+                    className={`block mb-2 text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                  >
+                    Message
+                  </label>
+                  <textarea
+                    id="message"
+                    rows={4}
+                    className={`w-full p-3 rounded-md border ${
+                      darkMode 
+                        ? 'bg-gray-700 border-gray-600 text-white' 
+                        : 'bg-gray-50 border-gray-300 text-gray-900'
+                    }`}
+                    placeholder="How can we help you?"
+                    required
+                  />
+                </div>
+                
+                <Button 
+                  type="submit"
+                  size="md"
+                  className="w-full"
+                  style={{ 
+                    background: `linear-gradient(to right, ${colors[0]}, ${colors[1]})`,
+                    border: 'none'
+                  }}
+                >
+                  Send Message
+                </Button>
+              </form>
+            </motion.div>
+            
+            {/* Help Resources */}
+            <motion.div
+              variants={containerVariants}
+              className="space-y-6"
+            >
+              {[
+                {
+                  title: "Frequently Asked Questions",
+                  description: "Find answers to common questions about our services",
+                  icon: <BookOpen size={28} />,
+                  link: "/faq"
+                },
+                {
+                  title: "Help Center",
+                  description: "Explore our knowledge base for tutorials and guides",
+                  icon: <Award size={28} />,
+                  link: "/help-center"
+                },
+                {
+                  title: "Support Channels",
+                  description: "Reach our support team through various channels",
+                  icon: <MessageSquare size={28} />,
+                  link: "/support"
+                }
+              ].map((resource, index) => (
+                <motion.div
+                  key={`resource-${index}`}
+                  variants={itemVariants}
+                  className={`p-5 rounded-lg bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow cursor-pointer`}
+                  whileHover={{ 
+                    y: -5,
+                    boxShadow: `0 15px 30px -10px ${colors[0]}33`,
+                    transition: { duration: 0.2 } 
+                  }}
+                  onClick={() => navigate(resource.link)}
+                >
+                  <div className="flex items-center">
+                    <div 
+                      className="p-3 rounded-full mr-4"
+                      style={{ background: `linear-gradient(135deg, ${colors[0]}22, ${colors[1]}44)` }}
+                    >
+                      {React.cloneElement(resource.icon, {
+                        style: { color: colors[0] }
+                      })}
+                    </div>
+                    <div>
+                      <h4 className={`text-lg font-medium ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+                        {resource.title}
+                      </h4>
+                      <p className={`mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        {resource.description}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </div>
+      </section>
       {/* Footer Section */}
       <footer className="py-12 px-4 bg-gray-100 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
         <div className="max-w-6xl mx-auto">
@@ -677,7 +844,7 @@ const LandingPage: React.FC = () => {
           </div>
         </div>
       </footer>
-      {/* Other sections remain the same */}
+      
     </div>
   );
 };
